@@ -29,7 +29,7 @@ df = pd.read_csv(output_file)
 df.rename(columns={'延床面積（�u）': '延床面積（㎡）'}, inplace=True)
 
 # リネーム後の列名を表示して確認
-print("リネーム後の列名:\n", df.columns)
+# print("リネーム後の列名:\n", df.columns)
 
 # 必要なデータ操作を行う
 # 例: 延床面積（㎡）のデータを数値型に変換
