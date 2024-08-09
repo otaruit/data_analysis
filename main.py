@@ -7,8 +7,8 @@ import warnings
 
 
 # # ファイルのエンコーディングを変換するスクリプト
-input_file = "Tokyo_20232_20241.csv"
-output_file = "Tokyo_20232_20241_utf8.csv"
+input_file = "Hokkaido_Otaru City_Inaho_20234_20241.csv"
+output_file = "Hokkaido_Otaru City_Inaho_20234_20241_utf8.csv"
 
 # # Shift_JIS から UTF-8 に変換
 # with open(input_file, 'r', encoding='shift_jis', errors='replace') as f_in:
@@ -41,11 +41,16 @@ floor_area = {
 }
 
 # 文字列の置換を行い、カンマを削除してから数値に変換する
+# '延床面積（㎡）' 列が文字列型であることを確認する
+df["延床面積（㎡）"] = df["延床面積（㎡）"].astype(str)
+
+# その後、置換処理を行う
 df["延床面積（㎡）"] = df["延床面積（㎡）"].replace(floor_area)
 df["延床面積（㎡）"] = df["延床面積（㎡）"].str.replace('�u', '㎡')
 df["延床面積（㎡）"] = df["延床面積（㎡）"].str.replace('㎡', '')
 df["延床面積（㎡）"] = df["延床面積（㎡）"].str.replace(',', '')
 df["延床面積（㎡）"] = pd.to_numeric(df["延床面積（㎡）"], errors='coerce')
+
 
 # 変更後のデータを表示
 print(df.head())
@@ -66,15 +71,33 @@ df['最寄駅：距離（分）'] = df['最寄駅：距離（分）'].replace(di
 # 最終的なデータの確認
 # print(df.describe())
 
-# df_tmp = df.groupby("種類").sum()
-# df_tmp["取引価格（総額）"].plot.pie(y="取引価格（総額）")
-# plt.show()
+df_tmp = df.groupby("種類").sum()
+df_tmp["取引価格（総額）"].plot.pie(y="取引価格（総額）")
+plt.show()
 
-# df_tmp = df.groupby("種類").sum().reset_index()
-# sns.barplot(x="種類", y="取引価格（総額）", data=df_tmp)
-# plt.show()
+df_tmp = df.groupby("種類").sum().reset_index()
+sns.barplot(x="種類", y="取引価格（総額）", data=df_tmp)
+plt.show()
 
 df_tmp = df.groupby("種類")["取引価格（総額）"].agg(["mean", "min", "max", "median", "std"])
 
 df_tmp = df.groupby("種類").sum()
-df_tmp    
+
+#取引の種類別にデータフレームを定義
+df_ap = df[df["種類"] == "中古マンション等"]
+df_l = df[df["種類"] == "宅地(土地)"]
+df_lap = df[df["種類"] == "宅地(土地と建物)"]
+
+df_ap["取引価格（総額）"].hist(bins=1000,range=(0, 800000000))
+plt.title('中古マンション等')
+plt.xlabel('取引金額')
+plt.ylabel('件数')
+plt.show()
+
+
+#宅地(土地)
+df_l["取引価格（総額）"].hist(bins=1000,range=(0, 18000000000))
+plt.title('土地(宅地)')
+plt.xlabel('取引金額')
+plt.ylabel('件数')
+plt.show()
